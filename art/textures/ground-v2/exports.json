@@ -1,0 +1,20 @@
+{
+  "grass": {
+    "master": "art/textures/ground-v2/grass-master.png",
+    "runtime": "client/assets/grass-v2.webp",
+    "runtime_sha256": "ccf960fea8764a9c337851a86d28433a346f82978533df96b14ab99c3ee506a7",
+    "bytes": 297930
+  },
+  "asphalt": {
+    "master": "art/textures/ground-v2/asphalt-master.png",
+    "runtime": "client/assets/asphalt-v2.webp",
+    "runtime_sha256": "23a0ca87d2b30e5a8c3fe65350be9be84ea060d3dcabc7b230e5ff96dbbf10bc",
+    "bytes": 325522
+  },
+  "dirt": {
+    "master": "art/textures/ground-v2/dirt-master.png",
+    "runtime": "client/assets/dirt-v2.webp",
+    "runtime_sha256": "10033a0dbfb99189f4f84272ea2d69f9b9b338396b279020f32af95e12d790d2",
+    "bytes": 271068
+  }
+}

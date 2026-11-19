@@ -1,0 +1,13 @@
+# Ground-v2 prompt set
+
+Tool: built-in image_gen; one generation each, no paid third-party API/addon.
+All three images are independent production albedo materials, not photographs cut from the supplied references. Source hashes in sources.json; exports in exports.json. Candidate for review, not approved final art.
+
+## grass
+A production seamless square top-down orthographic albedo texture of believable Russian small-town courtyard grass, covering roughly four by four metres. Hand-painted naturalistic game environment matching a warm restrained painterly 2.5D Russian town. One continuous ground surface, no perspective or horizon. Muted olive and fresh green grasses, organic patches of yellow straw, irregular thinner places showing a little cool brown soil, some short recently cut blades and small denser tufts, very sparse tiny birch leaves, a few fine dry stems. Fine details subordinate to readable subtle broad mottling. Natural irregular distribution, no obvious circles, clusters or arranged items, no flowers, no big sticks, no stones larger than a few cm, no individual hero object. Uniform diffuse overcast lighting, no cast shadows, no vignette, no border, no scene. Perfectly tileable matching all opposite edges. Full opaque image without text or grid.
+
+## asphalt
+A production seamless square top-down orthographic albedo texture of everyday maintained Russian town asphalt road surface, four by four metres of material only, not a road segment. Restrained warm painterly naturalism for a 2.5D Russian town game. Fine dense aggregate, charcoal warm gray, slight broad dusty tonal wear and faint faded repair variation, occasional tiny pits, no major cracks, no markings, no edges, no curb, no tyre stripes, no objects, no horizon or perspective, no dramatic lighting, no shadows or vignette. Material must remain calm at game scale. Uniform diffuse light. Perfectly tileable on opposite edges, opaque, no text/grid/frame.
+
+## dirt
+A production seamless square top-down orthographic albedo texture of compacted sandy loam earth for a Russian settlement dirt road, roughly four by four metres material only, not a road segment. Restrained painterly naturalism matching warm 2.5D Russian small-town game. Muted gray-beige light brown earth, fine grains and dust, subtle uneven compressed earth, scattered very small rounded gravel, sparse fine roots, darker moist flecks but not mud puddles. Organic gentle mottling. No road boundaries, no wheel tracks, no directional stripes, no grass areas, no perspective, horizon, people, objects, shadows, vignette, text, grid or border. Uniform diffuse overcast illumination, perfectly seamless opposite edges, fully opaque.

@@ -1,0 +1,34 @@
+{
+  "frameWidth": 160,
+  "frameHeight": 240,
+  "columns": 30,
+  "rows": 16,
+  "directionRows": 2,
+  "fps": 24,
+  "anchor": [
+    80.0,
+    186.99606983631088
+  ],
+  "states": {
+    "idle": {
+      "start": 0,
+      "count": 8,
+      "fps": 3.2
+    },
+    "walk": {
+      "start": 8,
+      "count": 48,
+      "fps": 22.857142857142858
+    },
+    "work": {
+      "start": 56,
+      "count": 4,
+      "fps": 8
+    }
+  },
+  "worldHeight": 1.9,
+  "walkSpeed": 0.9831029185867896,
+  "strideMeters": 2.064516129032258,
+  "cycleSeconds": 2.1,
+  "modelStatus": "smooth-clothing-gait-review"
+}

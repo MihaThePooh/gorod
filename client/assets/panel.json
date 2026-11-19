@@ -1,0 +1,125 @@
+{
+  "asset_id": "panel-five-storey-v3",
+  "status": "accepted-initial-asset",
+  "floors": 5,
+  "entrances": 2,
+  "world_units": "metres",
+  "footprint": [
+    [
+      -15,
+      -5
+    ],
+    [
+      15,
+      -5
+    ],
+    [
+      15,
+      5
+    ],
+    [
+      -15,
+      5
+    ]
+  ],
+  "entry_points": [
+    [
+      -7.5,
+      -6.65,
+      0
+    ],
+    [
+      7.5,
+      -6.65,
+      0
+    ]
+  ],
+  "anchor_world": [
+    0,
+    0,
+    0
+  ],
+  "anchor_pixel": [
+    672.453,
+    757.248
+  ],
+  "footprint_pixel": [
+    [
+      208.244,
+      661.062
+    ],
+    [
+      958.761,
+      1023.175
+    ],
+    [
+      1136.662,
+      853.434
+    ],
+    [
+      386.145,
+      491.322
+    ]
+  ],
+  "camera": {
+    "offset": [
+      32,
+      -45,
+      51
+    ],
+    "target": [
+      0,
+      -0.7,
+      7.5
+    ],
+    "ortho_scale": 43
+  },
+  "seed": 17,
+  "render": {
+    "samples": 40,
+    "threads": 2,
+    "width": 1320,
+    "height": 1200
+  },
+  "material_count": 20,
+  "object_count": 21,
+  "all_facades": true,
+  "textures": "procedural packed in blend; no external images",
+  "variants": "palette/seed/render in panel-config.json; dimensions fixed",
+  "collision_note": "footprint is wall rectangle; balconies/canopies project outside it; entry_points are approach points",
+  "image_size": [
+    1320,
+    1200
+  ],
+  "alpha_bounds": [
+    186,
+    118,
+    1139,
+    1025
+  ],
+  "exports": {
+    "660": {
+      "file": "panel-v3-660.png",
+      "size": [
+        660,
+        600
+      ],
+      "anchor_pixel": [
+        336.226,
+        378.624
+      ]
+    },
+    "330": {
+      "file": "panel-v3-330.png",
+      "size": [
+        330,
+        300
+      ],
+      "anchor_pixel": [
+        168.113,
+        189.312
+      ]
+    }
+  },
+  "png_sha256": "26a51dde813dd83dc6ab835f9b08dc3ebc9acf8cf64e3129a31938910dac1226"
+}

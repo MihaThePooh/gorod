@@ -1,0 +1,23 @@
+{
+  "grass": {
+    "size": [
+      1254,
+      1254
+    ],
+    "sha256": "ceac39701c50713eaa4b843b7aad586ce7def5a62adae977d0ca2154518fcb47"
+  },
+  "asphalt": {
+    "size": [
+      1254,
+      1254
+    ],
+    "sha256": "3917bc6588cf0e309e84ce7faa99bffa82ec4678e3dda6ba2ac0d249d86449bd"
+  },
+  "dirt": {
+    "size": [
+      1254,
+      1254
+    ],
+    "sha256": "958ce2780094f6c5a770bcd9f528daed6bb3176d4ebbd48479a07403c8fe64bc"
+  }
+}
