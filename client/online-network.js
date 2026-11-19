@@ -9,7 +9,7 @@ export function network({player,camera,toast,setWorking}){
  function receive(next){
   if(accountMode&&identity&&identity!==next.me.id){location.reload();return}identity=next.me.id;
   if(state&&(next.revision<state.revision||(next.boot===state.boot&&next.clock<state.clock)))return;state=next;timeline.push(next,performance.now()/1000);
-  if(!initialized||Math.hypot(player.x-next.me.x,player.y-next.me.y)>1.8){player.x=next.me.x;player.y=next.me.y;camera.x=player.x;camera.y=player.y;setWorking(false);initialized=true}
+  if(!initialized||Math.hypot(player.x-next.me.x,player.y-next.me.y)>1.8){player.x=next.me.x;player.y=next.me.y;if(!initialized||camera.follow){camera.x=player.x;camera.y=player.y}setWorking(false);initialized=true}
   for(const p of next.members.filter(p=>!p.me&&p.online)){
    const peer=peers.get(p.id)||{...p,time:0,walkDistance:0,state:'idle'};peer.target={x:p.x,y:p.y};peer.working=p.working;peer.direction=p.direction;peer.name=p.name;peer.seen=performance.now();peers.set(p.id,peer)
   }
@@ -28,7 +28,7 @@ export function network({player,camera,toast,setWorking}){
   try{const r=await hubFetch(new URL('session',endpoint));if(!r.ok)throw Error('Сервис входа временно недоступен.');const session=await r.json();if(identity&&session.account.slice(0,12)!==identity){location.reload();return}await join()}
   catch(e){document.querySelector('#onlineStatus').textContent='Нет связи · повторяю…';setTimeout(recover,5000)}finally{reconnecting=false}
  }
- const api={get ready(){return connected&&!!state},get me(){return state?.me},get state(){return state},get others(){return [...peers.values()]},subscribe(fn){listener=fn;if(state)fn(state)},async route(target){if(!connected||!town)return;steering=false;try{receive(await post('route',{town,target}))}catch(e){toast(e.message)}},steer(x,y){if(!connected)return;if(x||y){if(performance.now()-lastSteer<220)return;lastSteer=performance.now();steering=true;post('route',{town,target:{x:player.x+x*2,y:player.y+y*2}}).then(receive).catch(()=>{})}else if(steering){steering=false;post('route',{town,target:null}).then(receive).catch(()=>{})}},async action(type){
+ const api={get ready(){return connected&&!!state},get me(){return state?.me},get state(){return state},get others(){return [...peers.values()]},subscribe(fn){listener=fn;if(state)fn(state)},async route(target){if(!connected||!town)return false;steering=false;try{receive(await post('route',{town,target}));return true}catch(e){toast(e.message);return false}},steer(x,y){if(!connected)return;if(x||y){if(performance.now()-lastSteer<220)return;lastSteer=performance.now();steering=true;post('route',{town,target:{x:player.x+x*2,y:player.y+y*2}}).then(receive).catch(()=>{})}else if(steering){steering=false;post('route',{town,target:null}).then(receive).catch(()=>{})}},async action(type){
   if(!connected||!town)throw Error('Нет связи с посёлком. Подожди переподключения.');const body={town,type,id:crypto.randomUUID()};let last;
   for(let attempt=0;attempt<2;attempt++){try{const next=await post('action',body);receive(next);return next}catch(e){last=e;if(e.name!=='AbortError'&&!(e instanceof TypeError))break}}
   throw Error(last?.name==='AbortError'?'Сервер не ответил. Состояние обновится после подключения.':last?.message||'Нет связи с сервером.');

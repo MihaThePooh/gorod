@@ -11,7 +11,7 @@ let width=0,height=0,dpr=1,path=[],keys=new Set(),ready=false,clock=0;
 let construction=null;
 let images={},panel,atlas,ground,worldSeed=29,pointers=new Map(),drag=null,pinch=null,work=false;
 function rand(){worldSeed=(Math.imul(worldSeed,1664525)+1013904223)|0;return (worldSeed>>>0)/4294967296}
-function resize(){width=innerWidth;height=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr)}
+function resize(){width=innerWidth;height=innerHeight;dpr=Math.min(devicePixelRatio||1,2);const w=Math.round(width*dpr),h=Math.round(height*dpr);if(canvas.width!==w)canvas.width=w;if(canvas.height!==h)canvas.height=h}
 addEventListener('resize',resize);resize();
 function project(x,y,z=0){return {x:(rx*(x-camera.x)+ry*(y-camera.y))*PPU*camera.zoom+width/2,y:(dx*(x-camera.x)+dy*(y-camera.y)-.735*z)*PPU*camera.zoom+height*.57}}
 function unproject(x,y){const u=(x-width/2)/(PPU*camera.zoom),v=(y-height*.57)/(PPU*camera.zoom),det=rx*dy-ry*dx;return {x:camera.x+(dy*u-ry*v)/det,y:camera.y+(-dx*u+rx*v)/det}}
@@ -31,28 +31,48 @@ function route(target){
  }
  if(!found){toast('Путь не найден. Попробуй выбрать место ближе.');return false}
  path=[];for(let p=found;prev.get(key(...p));p=prev.get(key(...p)))path.push({x:p[0],y:p[1]});path.reverse();
- construction?.stop();work=false;updateWork();camera.follow=true;return true;
+ construction?.stop();work=false;updateWork();return true;
 }
 function updateWork(){ui.state.textContent=work?'Ремонтирует дорогу':path.length?'Идёт к месту':'Готов к работе'}
 document.querySelector('#follow').onclick=()=>{camera.follow=true};
 document.querySelector('#plus').onclick=()=>setZoom(camera.zoom+.10);document.querySelector('#minus').onclick=()=>setZoom(camera.zoom-.10);ui.zoom.oninput=()=>setZoom(Number(ui.zoom.value));
 document.querySelector('#help').onclick=()=>{ui.hint.hidden=!ui.hint.hidden};
 canvas.addEventListener('wheel',e=>{e.preventDefault();setZoom(camera.zoom*Math.exp(-e.deltaY*.001))},{passive:false});
+function beginPinch(){
+ const [a,b]=[...pointers.values()],x=(a.x+b.x)/2,y=(a.y+b.y)/2;
+ pinch={distance:Math.hypot(a.x-b.x,a.y-b.y),zoom:camera.zoom,anchor:unproject(x,y)};
+ camera.follow=false;if(drag)drag.moved=true;
+}
 canvas.addEventListener('pointerdown',e=>{
  if(!ready)return;canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(pointers.size===1)drag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false};
- if(pointers.size===2){const [a,b]=[...pointers.values()];pinch={distance:Math.hypot(a.x-b.x,a.y-b.y),zoom:camera.zoom};if(drag)drag.moved=true}
+ if(pointers.size>=2)beginPinch();
 });
 canvas.addEventListener('pointermove',e=>{
  if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
- if(pointers.size===2&&pinch){const[a,b]=[...pointers.values()];setZoom(pinch.zoom*Math.hypot(a.x-b.x,a.y-b.y)/Math.max(pinch.distance,1));return}
+ if(pointers.size>=2&&pinch){
+  const[a,b]=[...pointers.values()];setZoom(pinch.zoom*Math.hypot(a.x-b.x,a.y-b.y)/Math.max(pinch.distance,1));
+  const under=unproject((a.x+b.x)/2,(a.y+b.y)/2);camera.x+=pinch.anchor.x-under.x;camera.y+=pinch.anchor.y-under.y;return;
+ }
  if(drag&&pointers.size===1){
   if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>7)drag.moved=true;
   if(drag.moved){const a=unproject(drag.x,drag.y),b=unproject(e.clientX,e.clientY);camera.x+=a.x-b.x;camera.y+=a.y-b.y;camera.follow=false;drag.x=e.clientX;drag.y=e.clientY}
  }
 });
-function pointerUp(e){const tap=pointers.size===1&&drag&&!drag.moved&&!pinch;pointers.delete(e.pointerId);if(tap&&!construction?.mapTap(e.clientX,e.clientY))route(unproject(e.clientX,e.clientY));if(pointers.size===0){drag=null;pinch=null}}
-canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',()=>{pointers.clear();drag=null;pinch=null});
+function pointerUp(e,allowTap=true){
+ if(!pointers.has(e.pointerId))return;
+ const tap=allowTap&&pointers.size===1&&drag&&!drag.moved&&!pinch;
+ pointers.delete(e.pointerId);
+ if(tap&&!construction?.mapTap(e.clientX,e.clientY))route(unproject(e.clientX,e.clientY));
+ if(pointers.size>=2){beginPinch();return}
+ pinch=null;
+ // Continue from the remaining finger, never from the pre-pinch drag origin.
+ if(pointers.size===1){const p=[...pointers.values()][0];drag={x:p.x,y:p.y,startX:p.x,startY:p.y,moved:true}}
+ else drag=null;
+}
+canvas.addEventListener('pointerup',e=>pointerUp(e));
+canvas.addEventListener('pointercancel',e=>pointerUp(e,false));
+canvas.addEventListener('lostpointercapture',e=>pointerUp(e,false));
 addEventListener('keydown',e=>{if(e.target.matches('input,button')||document.querySelector('dialog[open]'))return;if(['w','a','s','d','ц','ф','ы','в','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();keys.add(e.key.toLowerCase());construction?.stop();path=[];work=false;updateWork()}});
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));addEventListener('blur',()=>{keys.clear();pointers.clear();drag=null;pinch=null});
 function update(dt){
@@ -74,7 +94,17 @@ function update(dt){
 }
 async function makeGround(){const map=document.createElement('canvas');map.width=map.height=2304;const c=map.getContext('2d');c.setTransform(16,0,0,16,72*16,72*16);createGround(c,images,houses).draw(c);return createImageBitmap(map)}
 const trees=[];for(let i=0;i<90;i++){const x=rand()*126-63,y=rand()*126-63;if(!Object.values(PLACES).some(p=>Math.hypot(p.x-x,p.y-y)<10)&&!blocked(x,y)&&Math.abs(y+14)>7&&!(Math.abs(x)<23&&y<1&&y> -25))trees.push({x,y,size:4+rand()*2.5,hue:rand()})}
-function drawGround(){const p=project(-72,-72),s=PPU*camera.zoom/16;ctx.save();ctx.transform(rx*s,dx*s,ry*s,dy*s,p.x,p.y);ctx.drawImage(ground,0,0);ctx.restore()}
+// Cache the expensive affine ground transform around the viewport; walking only blits it.
+let groundView=null;
+function drawGround(){
+ const p=project(-72,-72),s=PPU*camera.zoom/16,pad=160;
+ if(!groundView||groundView.zoom!==camera.zoom||groundView.width!==width||groundView.height!==height||groundView.dpr!==dpr||Math.abs(p.x-groundView.x)>pad||Math.abs(p.y-groundView.y)>pad){
+  const image=document.createElement('canvas');image.width=Math.ceil((width+pad*2)*dpr);image.height=Math.ceil((height+pad*2)*dpr);const c=image.getContext('2d');
+  c.setTransform(dpr,0,0,dpr,pad*dpr,pad*dpr);c.transform(rx*s,dx*s,ry*s,dy*s,p.x,p.y);c.drawImage(ground,0,0);
+  groundView={image,x:p.x,y:p.y,zoom:camera.zoom,width,height,dpr};
+ }
+ ctx.drawImage(groundView.image,p.x-groundView.x-pad,p.y-groundView.y-pad,groundView.image.width/dpr,groundView.image.height/dpr);
+}
 function tree(t){const p=project(t.x,t.y),k=PPU*camera.zoom/(384/8.5)*(t.size/6);const pad=40*camera.zoom;if(p.x+128*k+pad<0||p.x-128*k-pad>width||p.y-(192+3*.735*384/8.5)*k+384*k+pad<0||p.y-(192+3*.735*384/8.5)*k-pad>height)return;ctx.save();ctx.fillStyle='#203b2828';ctx.beginPath();ctx.ellipse(p.x+9*camera.zoom,p.y,24*camera.zoom,8*camera.zoom,0,0,Math.PI*2);ctx.fill();ctx.drawImage(images.birch,p.x-128*k,p.y-(192+3*.735*384/8.5)*k,256*k,384*k);ctx.restore()}
 function house(h){const p=project(h.x,h.y),k=(1000/1200)*camera.zoom;const nearPlayer=player.x>h.x-15.5&&player.x<h.x+15.5&&player.y>h.y+5;
  const left=p.x-panel.anchor_pixel[0]*k,top=p.y-panel.anchor_pixel[1]*k;if(left+images.panel.width*k<0||left>width||top+images.panel.height*k<0||top>height)return;
@@ -98,4 +128,4 @@ try{
  setTimeout(()=>{ui.hint.style.opacity='.0';setTimeout(()=>{ui.hint.hidden=true;ui.hint.style.opacity='1'},250)},13000);
 }catch(e){ui.loading.textContent='Не удалось загрузить посёлок. Обнови страницу.';console.error(e)}
 // Read-only diagnostics are shared by automated QA and the local teaching notes.
-window.townDebug={get ready(){return ready},get player(){return {...player}},get camera(){return {...camera}},get blocked(){return blocked(player.x,player.y)},project,unproject,route,setZoom,get construction(){return {state:construction.state,running:construction.running,activePlace:construction.activePlace}}};
+window.townDebug={get destination(){return path.length?{...path.at(-1)}:null},get ready(){return ready},get player(){return {...player}},get camera(){return {...camera}},get blocked(){return blocked(player.x,player.y)},project,unproject,route,setZoom,get construction(){return {state:construction.state,running:construction.running,activePlace:construction.activePlace}}};

@@ -1,6 +1,6 @@
 """Build a separate online preview from the accepted solo client without replacing it."""
 from pathlib import Path
-import shutil
+import shutil,re
 root=Path(__file__).resolve().parents[1];source=root/'client';out=root/'.online-client-v1';out.mkdir(exist_ok=True)
 files=['index.html','style.css','game.js','surfaces.js','construction.js','online-network.js','hub-session.js','motion-timeline.js']
 for n in files:shutil.copyfile(source/n,out/n)
@@ -34,6 +34,9 @@ s=s.replace("function mapTap(x,y){for(const [name,p] of Object.entries(PLACES)){
 s=s.replace("ctx.strokeStyle=state.phase==='paid'?'#7b9d7c':'#edc160';ctx.lineWidth=.10;ctx.strokeRect(14,-17,8,6);", "if(state.phase!=='paid'){ctx.strokeStyle='#edc160';ctx.lineWidth=.10;ctx.strokeRect(14,-17,8,6);}")
 s=s.replace(" function landmark(ctx,name,scale){", " function landmark(ctx,name,scale){\n  if(state.phase==='paid'&&name==='site')return;")
 s=s.replace("backend.subscribe(next=>{state=next;", "backend.subscribe(next=>{const completed=!!state.me&&state.phase!=='paid'&&next.phase==='paid';state=next;if(completed)toast('Заказ выполнен. Оплата сохранена. История — в «Заказах».');")
+# Repeated identical text assignments replace text nodes and invalidate mobile layout.
+s=s.replace(' const $=id=>document.getElementById(id);', ' const $=id=>document.getElementById(id);function setText(id,value){const el=$(id),text=String(value);if(el.textContent!==text)el.textContent=text}')
+s=re.sub(r"\$\('([^']+)'\)\.textContent=([^;]+);",lambda m:f"setText('{m[1]}',{m[2]});",s)
 (out/'online-contract.js').write_text(s)
 s=(out/'game.js').read_text().replace("from './contract-ui.js'", "from './online-contract.js'")
 s=s.replace("function route(target){", "function route(target){\n if(construction&&!construction.canMove){toast('Подожди подключения к посёлку.');return false}")
@@ -44,10 +47,12 @@ chunk=chunk.replace("\n}\n", "\n if(who.name){ctx.font='600 11px system-ui';ctx.
 s=s[:a]+chunk+s[b:]
 s=s.replace("const objects=[...Object.entries", "const objects=[...(construction.others||[]).map(p=>({depth:dx*p.x+dy*p.y,draw:()=>worker(p,'#88d5dd')})),...Object.entries")
 a=s.index('function route(target){');b=s.index('function updateWork()',a)
-s=s[:a]+"""function route(target){
+s=s[:a]+"""let routeSerial=0,routePending=false;
+function route(target){
  if(!construction?.canMove){toast('Подожди подключения к посёлку.');return false}
  if(blocked(target.x,target.y)){toast('Здесь пройти нельзя.');return false}
- construction.routeIntent(target);path=[target];camera.follow=true;return true;
+ const serial=++routeSerial;routePending=true;path=[{...target}];
+ construction.routeIntent(target).then(accepted=>{if(serial!==routeSerial)return;routePending=false;if(!accepted)path=[]});return true;
 }
 """+s[b:]
 a=s.index('function update(dt){');b=s.index('async function makeGround()',a)
@@ -62,7 +67,8 @@ s=s[:a]+"""function update(dt){
  // The route flag leads the interpolation buffer; animate only rendered displacement.
  player.walkDistance+=moved;const state=me?.working?'work':moved>.00001?'walk':'idle';
  if(state!==player.state){player.time=0;player.state=state}player.time+=dt;
- if(!me?.moving)path=[];ui.state.textContent=state==='work'?'Ремонтирует дорогу':state==='walk'?'Идёт к месту':'Готов к работе';
+ // Keep the marker through request latency and the delayed final walking frames.
+ if(!routePending&&me&&!me.moving&&Math.hypot(player.x-me.x,player.y-me.y)<.02)path=[];const label=state==='work'?'Ремонтирует дорогу':state==='walk'?'Идёт к месту':'Готов к работе';if(ui.state.textContent!==label)ui.state.textContent=label;
  if(camera.follow){const t=1-Math.exp(-dt*7);camera.x+=(player.x-camera.x)*t;camera.y+=(player.y-camera.y)*t}
 }
 """+s[b:]
