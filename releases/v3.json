@@ -1,0 +1,36 @@
+{
+  "version": "v3",
+  "date": "2026-11-19",
+  "url": "https://gorod.michaelperov.com/",
+  "public_files": {
+    "index.html": "ddbd3d7e63d4f2f51ec0bba72098a9dbddf9cb6d51a50c95f0d34ffeb149ae4e",
+    "style.css": "c14fce80685603b88c42d9028aa8359f86485d67509304cb67391354af59f852",
+    "game.js": "ad8d98dbf9179f6df58fc01dfaa0f02802c806e266e5d9de69a7fdaee0bfcc38",
+    "surfaces.js": "ef2723ec59841b093e261753d5c19a7ee8cd48a36935b1f2d2ddf6080e3ff241",
+    "construction.js": "1c69bd4b382af5d7dfcc80b4e69b20aa5c2fc4882407ea671c8631afd19e11e1",
+    "online-contract.js": "b11e71e1dc7c56fe68f48c7b51dff07cee6ae69fde9c1e9a4156e99983c67034",
+    "online-network.js": "5cdf232c7f3ab190d3027a1c5c539339054d1695c28b9c2431bd69d1aafb0794",
+    "hub-session.js": "0b5d0a08c53eb4d76d4d5b4e112d2fdff9ddcae4e440d643eebb98bf13724496",
+    "motion-timeline.js": "a77d100079abd569d986df3951035e47bb44a14b77c819b3cc6c7902771ebec4",
+    "manifest.webmanifest": "217c36fac98472ea4a2be3da9f08755a42c13f4d8e57d46478843fcb9df8ca8e",
+    "pwa.js": "5f290437ebad69ed37ebaac161632016375fcadac3381618a5e6a2bb3a366e92",
+    "sw.js": "fa3af9bff830986d76d161bc7bf2719f3ce8d296821d66374b3df917a5bbf01a",
+    "offline.html": "55488ecb66d2a3c2db984d8577e8a852ed70b3bf6553ce7d82256394333499a7",
+    "icons/icon-192.png": "7736e544be1414dc01f6dc71fa7ba154fc3e7bba0f075f7a879fa30885a78e75",
+    "icons/icon-512.png": "8d592093d961933ddbc528168187b9b22e447e5858e571de34ed998e3721e51f",
+    "assets/panel.png": "26a51dde813dd83dc6ab835f9b08dc3ebc9acf8cf64e3129a31938910dac1226",
+    "assets/worker.png": "18ba3eefd944c1c89f0757af158157c5796bd34506b4aa8e071902e5cda11ae5",
+    "assets/grass-v2.webp": "ccf960fea8764a9c337851a86d28433a346f82978533df96b14ab99c3ee506a7",
+    "assets/asphalt-v2.webp": "23a0ca87d2b30e5a8c3fe65350be9be84ea060d3dcabc7b230e5ff96dbbf10bc",
+    "assets/dirt-v2.webp": "10033a0dbfb99189f4f84272ea2d69f9b9b338396b279020f32af95e12d790d2",
+    "assets/paving.png": "47cdce11a7dc0ea86dc7d9be804842133a7ba475933f50c4e27ed8fd4d828534",
+    "assets/birch.png": "d5d912945670ad21eb6c52f3b8ec3a5dad9d568916310997e747349066c5c102",
+    "assets/panel.json": "d9bd6195c861e62d568ab9d21ecf0aa6a982e38794f331eddf2f28bd882ff612",
+    "assets/worker.json": "f5a2af3ba6755496980b1c536331b163b0f9388c58df19b56859765eac66ec4f"
+  },
+  "server_files": {
+    "server/online.py": "fed3e35797009ed32ee08c321353cb8d9be23ee05f70ead50999e7179db67f3a",
+    "server/hub_auth.py": "0c57a408af957c0b4fb01cd26112a626f31aca7c616956aaef48df85c490813e"
+  },
+  "note": "Completed road order leaves the active HUD; worksite markers removed; archive and empty-jobs notice."
+}
