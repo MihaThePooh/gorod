@@ -52,7 +52,8 @@ s=s[:a]+"""function update(dt){
  const det=rx*dy-ry*dx,a=(dy*vx-ry*vy)/det,b=(-dx*vx+rx*vy)/det,len=Math.hypot(a,b);
  construction.steer(len?a/len:0,len?b/len:0);
  const moved=Math.hypot(player.x-before.x,player.y-before.y),me=construction.me;
- player.walkDistance+=moved;const state=me?.working?'work':me?.moving||moved>.002?'walk':'idle';
+ // The route flag leads the interpolation buffer; animate only rendered displacement.
+ player.walkDistance+=moved;const state=me?.working?'work':moved>.00001?'walk':'idle';
  if(state!==player.state){player.time=0;player.state=state}player.time+=dt;
  if(!me?.moving)path=[];ui.state.textContent=state==='work'?'Ремонтирует дорогу':state==='walk'?'Идёт к месту':'Готов к работе';
  if(camera.follow){const t=1-Math.exp(-dt*7);camera.x+=(player.x-camera.x)*t;camera.y+=(player.y-camera.y)*t}
